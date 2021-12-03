@@ -1,11 +1,9 @@
 from Project_Zero.data_access_layer.implementation_classes.customer_dao_imp import CustomerDAOImp
-
+from Project_Zero.data_access_layer.implementation_classes.customer_postgres_dao import CustomerPostgresDAO
 from Project_Zero.entities.customer import Customer
 
 customer_info_imp = CustomerDAOImp()
-# customer_info_postgres = CustomerPostgresInfo()
 customer = Customer("Test", "Customer", 103, 0, 1)
-# customer_for_postgres = Customer("Alex","Boras", 1, 233)
 
 
 def test_create_customer_success():
@@ -32,4 +30,3 @@ def test_update_customer_success():
 def test_delete_customer_success():
     confirm_customer_deleted = customer_info_imp.delete_customer_information(2)
     assert confirm_customer_deleted
-

@@ -5,10 +5,10 @@ from Project_Zero.entities.account import Account
 
 
 class AccountInfoImp(AccountInfo):
-    account_one = Account("first account", 1)
-    account_two = Account("second account", 2)
-    account_three = Account("to be deleted", 3)
-    account_four = Account("duplicate name", 4)
+    account_one = Account("first account", 1, 0)
+    account_two = Account("second account", 2, 1)
+    account_three = Account("to be deleted", 3, 2)
+    account_four = Account("duplicate name", 4, 3)
     account_list = [account_one, account_two, account_three, account_four]
     account_id_gen = 5
 

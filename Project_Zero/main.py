@@ -1,20 +1,36 @@
 from flask import Flask, request, jsonify
 
+from Project_Zero.custom_execeptions.insufficient_currency import InsufficientCurrency
 from Project_Zero.custom_execeptions.duplicate_customer_account_number import DuplicateCustomerAccountNumberException
 from Project_Zero.custom_execeptions.duplicate_account_name import DuplicateAccountNameException
+from Project_Zero.custom_execeptions.account_does_not_exist import AccountDoesNotExistException
 from Project_Zero.data_access_layer.implementation_classes.customer_dao_imp import CustomerDAOImp
 from Project_Zero.data_access_layer.implementation_classes.account_dao_imp import AccountInfoImp
+from Project_Zero.data_access_layer.implementation_classes.customer_postgres_dao import CustomerPostgresDAO
+from Project_Zero.data_access_layer.implementation_classes.account_postgres_dao import AccountPostgresDAO
 from Project_Zero.entities.customer import Customer
 from Project_Zero.entities.account import Account
+from Project_Zero.service_layer.implementation_services.customer_postgres_service import CustomerPostgresService
+from Project_Zero.service_layer.implementation_services.account_postgres_service import AccountPostgresService
 from Project_Zero.service_layer.implementation_services.customer_service_imp import CustomerServiceImp
 from Project_Zero.service_layer.implementation_services.account_service_imp import AccountServiceImp
 
+import logging
+
+logging.basicConfig(filename="records.log", level=logging.DEBUG, format=f"%(asctime)s %(levelname)s %(message)s")
+# there are a few different levels of logging going from the most inclusive to most exclusive:
+# debug
+# info
+# warning
+# error
+# critical
+
 app: Flask = Flask(__name__)
 
-customer_info = CustomerDAOImp()
-customer_service = CustomerServiceImp(customer_info)
-account_dao = AccountInfoImp()
-account_service = AccountServiceImp(account_dao)
+customer_info = CustomerPostgresDAO()  # CustomerDAOImp()
+customer_service = CustomerPostgresService(customer_info)  # CustomerServiceImp(customer_info)
+account_dao = AccountPostgresDAO()  # AccountInfoImp()
+account_service = AccountPostgresService(account_dao)  # AccountServiceImp(account_dao)
 
 
 @app.post("/customer")
@@ -46,7 +62,7 @@ def get_customer_information(customer_id: str):
     return result_as_json
 
 
-@app.get("/customer")
+@app.get("/customer/all")
 def get_all_customer_information():
     customer_as_customers = customer_service.service_get_all_customer_information()
     customer_as_dictionary = []
@@ -88,7 +104,8 @@ def create_account():
         body = request.get_json()
         new_account = Account(
             body["account"],
-            body["accountId"]
+            body["accountId"],
+            body["balance"]
         )
         created_account = account_service.service_create_account(new_account)
         created_account_as_dictionary = created_account.make_account_dictionary()
@@ -121,12 +138,47 @@ def update_account(customer_id: str):
         body = request.get_json()
         update_info = Account(
             body["account"],
-            body["accountId"]
+            body["accountId"],
+            body["balance"]
         )
         updated_customer = account_service.service_update_account_information(update_info)
         updated_customer_as_dictionary = updated_customer.make_account_dictionary()
         return jsonify(updated_customer_as_dictionary), 200
     except DuplicateAccountNameException as e:
+        error_message = {"errorMessage": str(e)}
+        return jsonify(error_message)
+
+
+@app.patch("/account/deposit/<account_id>")
+def update_deposit_account(account_id: str):
+    try:
+        body = request.get_json()
+        update_info = Account(
+            body["account"],
+            int(account_id),
+            body["balance"]
+        )
+        updated_account = account_service.service_deposit_account_balance(update_info)
+        updated_account_as_dictionary = updated_account.make_account_dictionary()
+        return jsonify(updated_account_as_dictionary), 200
+    except AccountDoesNotExistException as e:
+        error_message = {"errorMessage": str(e)}
+        return jsonify(error_message)
+
+
+@app.patch("/account/withdraw/<account_id>")
+def update_withdrawal_account(account_id: str):
+    try:
+        body = request.get_json()
+        update_info = Account(
+            body["account"],
+            int(account_id),
+            body["balance"]
+        )
+        updated_account = account_service.service_withdraw_account_balance(update_info)
+        updated_account_as_dictionary = updated_account.make_account_dictionary()
+        return jsonify(updated_account_as_dictionary), 200
+    except InsufficientCurrency as e:
         error_message = {"errorMessage": str(e)}
         return jsonify(error_message)
 

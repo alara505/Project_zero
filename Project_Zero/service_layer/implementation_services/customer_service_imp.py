@@ -24,7 +24,8 @@ class CustomerServiceImp(CustomerService):
 
     def service_update_customer_information(self, customer: Customer) -> Customer:
         for current_customer in self.customer_dao.customer_list:
-            if current_customer.account_id == customer.account_id:
+            if current_customer.account_id == customer.account_id: #Make sure to remove this, because if there isn't check
+            # anything, or make sense. Because you have customer_id to check if the new customer has the same or not.
                 if current_customer.customer_id != customer.customer_id:
                     if current_customer.account_number == customer.account_number:
                         raise DuplicateCustomerAccountNumberException("Account number is already taken!")
