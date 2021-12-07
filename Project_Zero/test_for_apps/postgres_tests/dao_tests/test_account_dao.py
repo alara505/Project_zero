@@ -3,17 +3,17 @@ from Project_Zero.entities.account import Account
 
 account_dao = AccountPostgresDAO()
 
-new_account = Account("test team", 0)
+new_account = Account("test team", 0, 100)
 account_names = {"Jake"}
 account_names.add("Sandy")
 account_names.add("Fed")
 account_names.add("Ale")
 
 new_accounts = account_names.pop()
-update_account = Account(new_accounts, 3)
+update_account = Account(new_accounts, 3, 0)
 
 deleted_account = account_names.pop()
-delete_account = Account(deleted_account, 0)
+delete_account = Account(deleted_account, 0, 0)
 
 
 def test_create_account_success():

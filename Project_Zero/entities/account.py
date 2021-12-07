@@ -1,7 +1,7 @@
 class Account:
     last_id = 0
 
-    def __init__(self, account: str, account_id: int, balance: int):
+    def __init__(self, account: str, account_id: int, balance: float):
         self.account = account
         self.account_id = account_id
         self.balance = balance

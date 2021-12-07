@@ -6,8 +6,8 @@ from Project_Zero.service_layer.implementation_services.account_service_imp impo
 account_dao = AccountInfoImp()
 account_service = AccountServiceImp(account_dao)
 
-bad_account = Account("duplicate name", 0)
-bad_update_account = Account("duplicate name", 1)
+bad_account = Account("duplicate name", 0, 100)
+bad_update_account = Account("duplicate name", 1, 100)
 
 
 def test_catch_creating_account_with_duplicate_name():
@@ -24,3 +24,5 @@ def test_catch_updating_account_with_duplicate_name():
         assert False
     except DuplicateAccountNameException as e:
         assert str(e) == "You can not use that name: it is already taken!"
+
+
