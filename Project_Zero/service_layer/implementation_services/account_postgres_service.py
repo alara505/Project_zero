@@ -45,8 +45,17 @@ class AccountPostgresService(AccountService):
                     raise InsufficientCurrency("You can not withdraw more than what you currently have!")
         raise AccountDoesNotExistException("This account does not exist in our database.")
 
-    def service_transfer_account_by_account_id(self, account: Account) -> Account:
-        pass
+    def service_transfer_account_by_account_id(self, transfer_account: Account, receiver_account: Account,
+                                               balance_transferred: float) -> Account:
+        accounts = self.account_dao.get_all_account_information()
+        for account in accounts:
+            if account.account_id == transfer_account.account_id:
+                if account.account_id == receiver_account.account_id:
+                    if balance_transferred > transfer_account.balance:
+                        raise InsufficientCurrency("You can not withdraw more than what you currently have!")
+                    return self.account_dao.transfer_from_account_to_account_by_id(transfer_account, receiver_account,
+                                                                                   balance_transferred)
+                raise AccountDoesNotExistException("This account does not exist in our database.")
 
     # used the update customer function for the account for the variables for deposit, and withdraw.
     def service_update_account_information(self, account: Account) -> Account:

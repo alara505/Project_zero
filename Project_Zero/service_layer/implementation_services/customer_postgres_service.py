@@ -25,7 +25,6 @@ class CustomerPostgresService(CustomerService):
     def service_get_all_customer_information(self) -> list[Customer]:
         return self.customer_dao.get_all_customer_information()
 
-
     def service_update_customer_information(self, customer: Customer) -> Customer:
         customers = self.customer_dao.get_all_customer_information()
         for current_customer in customers:

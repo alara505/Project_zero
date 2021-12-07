@@ -60,13 +60,31 @@ class AccountPostgresDAO(AccountInfo):
         connection.commit()
         return account
 
-    def transfer_from_account_to_account_by_id(self, account: Account) -> Account:
-        pass
+    def transfer_from_account_to_account_by_id(self, transfer_account: Account, received_account: Account,
+                                               balance_transfer: float) -> Account:
+        sql = "select balance from account where account_id = %s"
+        cursor = connection.cursor()
+        cursor.execute(sql, [transfer_account.account_id])
+        transfer_account_balance = cursor.fetchone()[0]
+
+        sql = "select balance from account where account_id = %s"
+        cursor.execute(sql, [received_account.account_id])
+        received_account_bal = cursor.fetchone()[0]
+        received_account_bal += balance_transfer
+        transfer_account_balance = balance_transfer - transfer_account_balance
+
+        sql = "update account set balance = %s where account_id = %s returning balance"
+        cursor.execute(sql, (received_account_bal, received_account.account_id))
+
+        sql = "update account set balance %s where account_id = %s returning balance"
+        cursor.execute(sql, (transfer_account_balance, transfer_account.account_id))
+        connection.commit()
+        return self.transfer_from_account_to_account_by_id(transfer_account, received_account, balance_transfer)
 
     def update_account_information(self, account: Account) -> Account:
         sql = "update account set account = %s, balance = %s where account_id = %s"
         cursor = connection.cursor()
-        cursor.execute(sql, (account.account, account.account_id, account.balance))
+        cursor.execute(sql, (account.account, account.balance, account.account_id))
         connection.commit()
         return account
 

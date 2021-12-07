@@ -40,7 +40,7 @@ class CustomerPostgresDAO(CustomerDAO):
         sql = "update customer set first_name = %s, last_name = %s, account_number = %s, account_id = %s where " \
               "customer_id = %s "
         cursor = connection.cursor()
-        cursor.execute(sql, (customer.first_name, customer.last_name, customer.account_number, customer.customer_id, customer.account_id))
+        cursor.execute(sql, (customer.first_name, customer.last_name, customer.account_number, customer.account_id, customer.customer_id))
         connection.commit()
         return customer
 
